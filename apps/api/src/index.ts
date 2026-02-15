@@ -16,7 +16,11 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   const app = Fastify({ logger: false });
 
-  await app.register(cors, { origin: true });
+  await app.register(cors, {
+    origin: true,
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    preflight: true,
+  });
 
   app.get("/health", async () => ({ ok: true }));
 
