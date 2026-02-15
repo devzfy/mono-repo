@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  type ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -11,10 +10,8 @@ import { useDebounced } from "../../../hooks/useDebounced";
 import type { GenderFilter, StatusFilter } from "../../api/user";
 import { useUsersInfinite } from "../../hooks/useUsersInfinite";
 import { useUsersTotal } from "../../hooks/useUsersTotal";
-import { getCachedScore } from "../../../lib/scoreCache";
-import { expensiveScore } from "../../../lib/expensiveScore";
-import { Badge } from "../../../components/ui/badge";
 import { LoadingRows } from "../../../pages/LoadingRows";
+import { useTableColumn } from "./col";
 
 
 
@@ -31,6 +28,7 @@ export type User = {
 };
 
 export default function UsersWowTable() {
+  const columns = useTableColumn()
   const limit = 150;
 
   const [search, setSearch] = useState("");
@@ -67,25 +65,7 @@ export default function UsersWowTable() {
     [q.data]
   );
 
-  const columns = useMemo<ColumnDef<User>[]>(
-    () => [
-      { accessorKey: "firstName", header: "First" },
-      { accessorKey: "lastName", header: "Last" },
-      { accessorKey: "email", header: "Email" },
-      { accessorKey: "age", header: "Age" },
-      { accessorKey: "gender", header: "Gender", cell: ({ row }) => row.original.gender.toUpperCase() },
-      { accessorKey: "status", header: "Status", cell: ({ row }) => <Badge variant={row.original.status === 'active' ? "default" : "destructive"}>{row.original.status}</Badge> },
-      {
-        id: "score",
-        header: "Computed Score",
-        cell: ({ row }) => {
-          const s = getCachedScore(row.original.id, () => expensiveScore(row.original));
-          return <span>{Number.isFinite(s) ? s.toFixed(1) : "--"}</span>;
-        },
-      },
-    ],
-    []
-  );
+
 
   const table = useReactTable({
     data,

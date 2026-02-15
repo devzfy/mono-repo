@@ -1,14 +1,13 @@
 import { useMemo, useState } from "react";
-import { DataGrid, type GridColDef, type GridSortModel } from "@mui/x-data-grid";
+import { DataGrid, type GridSortModel } from "@mui/x-data-grid";
 import { Box, TextField, MenuItem } from "@mui/material";
 
 import { useDebounced } from "../../../hooks/useDebounced";
 import { useUsersTotal } from "../../hooks/useUsersTotal";
 import { useUsersWithPage } from "../../hooks/useUsersWithPage";
-import { getCachedScore } from "../../../lib/scoreCache";
-import { expensiveScore } from "../../../lib/expensiveScore";
 import { type StatusFilter } from "../../api/user";
 import type { User } from "../../types/User";
+import { columns } from "./col";
 
 
 export default function MUIDataGrid() {
@@ -21,7 +20,7 @@ export default function MUIDataGrid() {
     { field: "lastName", sort: "asc" },
   ]);
 
-  const sortBy = (sortModel[0]?.field as "id" | "age" | "lastName" | undefined) ?? "lastName";
+  const sortBy = (sortModel[0]?.field as "id" | "age" | "lastName" | undefined) ?? undefined;
   const sortDir = (sortModel[0]?.sort as "asc" | "desc" | undefined) ?? "asc";
 
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 50 });
@@ -46,24 +45,7 @@ export default function MUIDataGrid() {
 
   const rows = useMemo<User[]>(() => q.data?.items ?? [], [q.data]);
 
-  const columns: GridColDef<User>[] = [
-    { field: "firstName", headerName: "First", flex: 1 },
-    { field: "lastName", headerName: "Last", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "age", headerName: "Age", width: 90 },
-    { field: "gender", headerName: "Gender", width: 110 },
-    { field: "status", headerName: "Status", width: 110 },
-    {
-      field: "computedScore",
-      headerName: "Computed Score",
-      width: 160,
-      sortable: false,
-      renderCell: (params) => {
-        const s = getCachedScore(params.row.id, () => expensiveScore(params.row));
-        return <span>{s.toFixed(1)}</span>;
-      },
-    },
-  ];
+
 
   return (
     <Box sx={{ p: 2 }}>
