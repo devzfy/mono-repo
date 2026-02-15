@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          BigInt   @id @default(autoincrement())
+  email       String   @unique
+  age         Int
+  status      String
+  updatedAt   DateTime @updatedAt
+  firstName   String
+  gender      Gender
+  lastName    String
+  phoneNumber String   @unique
+  publicId    String   @unique @default(uuid())
+
+  @@index([lastName])
+  @@index([age])
+  @@index([gender])
+  @@index([status])
+}
+
+enum Gender {
+  male
+  female
+}
